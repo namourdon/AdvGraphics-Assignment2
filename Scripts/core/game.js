@@ -53,26 +53,42 @@ var tplanet;
 var frplanet;
 var fiplanet;
 var quaternion;
+var dirLight;
+var hemiLight;
+var moon;
+var moonEmp;
 function init() {
     // Instantiate a new Scene object
     scene = new Scene();
     setupRenderer(); // setup the default renderer
     setupCamera(); // setup the camera
     // Add the sun to the Scene
-    sphereGeometry = new SphereGeometry(6, 32, 32);
+    sphereGeometry = new SphereGeometry(8, 32, 32);
     sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/sun.jpg', THREE.SphericalReflectionMapping) });
+    //sphereMaterial.opacity=0.1;
+    //sphereMaterial.transparent= true;
     //sphereMaterial.map= THREE.ImageUtils.loadTexture('Stone03.jpg');
-    sun = new gameObject(sphereGeometry, sphereMaterial, 10, 2, 1);
+    sun = new gameObject(sphereGeometry, sphereMaterial, 0, 0, 0);
     scene.add(sun);
     console.log("Add the sun to the scene");
     //Add the first planet to the scene
-    sphereGeometry = new SphereGeometry(4, 32, 32);
+    sphereGeometry = new SphereGeometry(6, 32, 32);
     sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/firstPlanet.jpg', THREE.SphericalReflectionMapping) });
     fplanet = new gameObject(sphereGeometry, sphereMaterial, 30, 20, 1);
     scene.add(fplanet);
     console.log("Added the first planet to the scene");
-    //Add the second planet to the scene
+    moonEmp = new Object3D();
+    moonEmp.position.set(30, 20, 1);
+    moonEmp.add(moon);
+    console.log("Added empty object to the moon");
+    //Add the moon
     sphereGeometry = new SphereGeometry(2, 32, 32);
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/moon.jpg', THREE.SphericalReflectionMapping) });
+    moon = new gameObject(sphereGeometry, sphereMaterial, 10, 5, 1);
+    fplanet.add(moon);
+    console.log("Added a moon to the scene");
+    //Add the second planet to the scene
+    sphereGeometry = new SphereGeometry(4, 32, 32);
     sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/secondPlanet.jpg', THREE.SphericalReflectionMapping) });
     splanet = new gameObject(sphereGeometry, sphereMaterial, 30, 1, 2);
     scene.add(splanet);
@@ -90,7 +106,7 @@ function init() {
     scene.add(frplanet);
     console.log("Added the fourth planet to the scene");
     //Add the fifth planet to the scene
-    sphereGeometry = new SphereGeometry(5, 32, 32);
+    sphereGeometry = new SphereGeometry(3, 32, 32);
     sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fifthPlanet.jpg', THREE.SphericalReflectionMapping) });
     fiplanet = new gameObject(sphereGeometry, sphereMaterial, 10, 20, 1);
     scene.add(fiplanet);
@@ -104,15 +120,39 @@ function init() {
     scene.add(ambientLight);
     console.log("Added an Ambient Light to Scene");
     // Add a SpotLight to the scene
-    spotLight = new SpotLight(0xffffff);
-    spotLight.position.set(50, 40, 5.4);
-    spotLight.rotation.set(-0.8, 42.7, 19.5);
-    spotLight.castShadow = true;
-    scene.add(spotLight);
-    console.log("Added a SpotLight Light to Scene");
+    //spotLight = new SpotLight(0xffffff);
+    //spotLight.position.set(10,2,1);
+    //spotLight.rotation.set(-0.8, 42.7, 19.5);
+    //spotLight.castShadow = true;
+    //scene.add(spotLight);
+    //console.log("Added a SpotLight Light to Scene");
+    var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+    hemiLight.color.setHSL(0.6, 1, 0.6);
+    hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+    hemiLight.position.set(10, 2, 1);
+    scene.add(hemiLight);
+    dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.color.setHSL(0.1, 1, 0.95);
+    dirLight.position.set(0, 0, 0);
+    dirLight.position.multiplyScalar(500);
+    scene.add(dirLight);
+    dirLight.castShadow = true;
+    dirLight.shadowMapWidth = 2048;
+    dirLight.shadowMapHeight = 2048;
+    var d = 50;
+    //d.position.set(0,0,0);
+    //scene.add(d);
+    //dirLight.target=d;
+    dirLight.shadowCameraLeft = -d;
+    dirLight.shadowCameraRight = d;
+    dirLight.shadowCameraTop = d;
+    dirLight.shadowCameraBottom = -d;
+    dirLight.shadowCameraFar = 3500;
+    dirLight.shadowBias = -0.0001;
+    dirLight.shadowCameraVisible = true;
     // add controls
     gui = new GUI();
-    control = new Control(0.05);
+    control = new Control(0.01);
     addControl(control);
     // Add framerate stats
     addStatsObject();
@@ -148,6 +188,8 @@ function gameLoop() {
     //cube.rotation.y += control.rotationSpeed;
     //sun.rotation.y+=control.rotationSpeed;
     fplanet.rotation.y += control.rotationSpeed;
+    moon.rotation.y += (control.rotationSpeed * 4);
+    moonEmp.rotation.y += control.rotationSpeed;
     // render using requestAnimationFrame
     requestAnimationFrame(gameLoop);
     // render the scene
@@ -156,7 +198,7 @@ function gameLoop() {
 // Setup default renderer
 function setupRenderer() {
     renderer = new Renderer();
-    renderer.setClearColor(0xEEEEEE, 1.0);
+    //renderer.setClearColor(0xEEEEEE, 1.0);
     renderer.setSize(CScreen.WIDTH, CScreen.HEIGHT);
     //renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
@@ -166,8 +208,8 @@ function setupRenderer() {
 function setupCamera() {
     camera = new PerspectiveCamera(45, config.Screen.RATIO, 0.1, 1000);
     //camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.x = 75;
-    camera.position.y = 40;
+    camera.position.x = 90;
+    camera.position.y = 10;
     camera.position.z = 25;
     camera.lookAt(new Vector3(0, 0, 0));
     console.log("Finished setting up Camera...");

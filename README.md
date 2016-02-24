@@ -1,3 +1,3 @@
 #COMP392-Lab3
 
-COMP392-Lab3 for COMP392 - Advanced Graphics @ Centennial College
+COMP392-Assignment2- Solar system @ Centennial College
