@@ -299,8 +299,8 @@ function addControl(controlObject: Control): void {
     gui.add(camera.position,'x',25,150);
     gui.add(camera.position,'y',0,75);
     gui.add(camera.position,'z',0,100);
-   gui.add(controlObject,'zoomCameraIn');
-   gui.add(controlObject,'zoomCameraOut');
+    gui.add(controlObject,'zoomCameraIn');
+    gui.add(controlObject,'zoomCameraOut');
 }
 
 function addStatsObject() {

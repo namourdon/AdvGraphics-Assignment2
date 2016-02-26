@@ -23,13 +23,13 @@ module objects {
             console.log("added zoomed camera");
 
         }
-        
-        public zoomCameraOut():void{
+
+        public zoomCameraOut(): void {
             camera.position.x = 90;
-    camera.position.y = 40;
-    camera.position.z = 30;
-    camera.lookAt(new Vector3(0, 0, 0));
-    console.log("Finished setting up Camera...");
+            camera.position.y = 40;
+            camera.position.z = 30;
+            camera.lookAt(new Vector3(0, 0, 0));
+            console.log("Finished setting up Camera...");
         }
     }
 
