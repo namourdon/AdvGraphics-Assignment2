@@ -1,3 +1,5 @@
+//Nashia Amourdon
+//Last edited:25.02.2016
 /// <reference path="_reference.ts"/>
 // MAIN GAME FILE
 // THREEJS Aliases
@@ -32,6 +34,7 @@ var gameObject = objects.gameObject;
 var scene;
 var renderer;
 var camera;
+var cameraZoom;
 var axes;
 //var cube: Mesh;
 var plane;
@@ -56,6 +59,7 @@ var quaternion;
 var dirLight;
 var hemiLight;
 var moon;
+var secondMoon;
 var moonEmp;
 var fistemptyRotation;
 var secondPlanet;
@@ -63,6 +67,7 @@ var thirdPlanet;
 var fourthPlanet;
 var fifthPlanet;
 var lightEmpty;
+var sMoonEmp;
 function init() {
     // Instantiate a new Scene object
     scene = new Scene();
@@ -70,7 +75,7 @@ function init() {
     setupCamera(); // setup the camera
     // Add the sun to the Scene
     sphereGeometry = new SphereGeometry(8, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/sun.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/sun.jpg') });
     sphereMaterial.opacity = 0.1;
     //sphereMaterial.transparent= true;
     //sphereMaterial.map= THREE.ImageUtils.loadTexture('Stone03.jpg');
@@ -79,8 +84,9 @@ function init() {
     console.log("Add the sun to the scene");
     //Add the first planet to the scene
     sphereGeometry = new SphereGeometry(7, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fourthPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fourthPlanet.jpg') });
     fplanet = new gameObject(sphereGeometry, sphereMaterial, 20, 0, 1);
+    fplanet.castShadow = true;
     scene.add(fplanet);
     console.log("Added the first planet to the scene");
     //empty object to hold the moon
@@ -104,9 +110,10 @@ function init() {
     console.log("Added empty object for first planet rotation around the sun");
     //Add the second planet to the scene
     sphereGeometry = new SphereGeometry(3, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/secondPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/secondPlanet.jpg') });
     splanet = new gameObject(sphereGeometry, sphereMaterial, 30, 0, 20);
     scene.add(splanet);
+    splanet.castShadow = true;
     console.log("Added the second planet to the scene");
     //Add the rotation to the Second Planet
     secondPlanet = new Object3D();
@@ -115,35 +122,44 @@ function init() {
     scene.add(secondPlanet);
     //Add the third planet to the scene
     sphereGeometry = new SphereGeometry(4, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/thirdPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/thirdPlanet.jpg') });
     tplanet = new gameObject(sphereGeometry, sphereMaterial, 35, 0, 25);
     scene.add(tplanet);
     console.log("Added the third planet to the scene");
+    //Add a moon to the second planet
+    sphereGeometry = new SphereGeometry(1, 32, 32);
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/moon.jpg', THREE.SphericalReflectionMapping) });
+    secondMoon = new gameObject(sphereGeometry, sphereMaterial, 5, 0, 1);
+    tplanet.add(secondMoon);
+    console.log("Added a moon to the scene");
     //Add the rotation to the third planet
     thirdPlanet = new Object3D();
     thirdPlanet.position.set(0, 0, 0);
+    thirdPlanet.castShadow = true;
     thirdPlanet.add(tplanet);
     scene.add(thirdPlanet);
     //Add the fourth planet to the scene
     sphereGeometry = new SphereGeometry(3, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/firstPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/firstPlanet.jpg') });
     frplanet = new gameObject(sphereGeometry, sphereMaterial, 40, 0, 40);
     scene.add(frplanet);
     console.log("Added the fourth planet to the scene");
     //Add the rotation to the fourth planet
     fourthPlanet = new Object3D();
     fourthPlanet.position.set(0, 0, 0);
+    fourthPlanet.castShadow = true;
     fourthPlanet.add(frplanet);
     scene.add(fourthPlanet);
     //Add the fifth planet to the scene
     sphereGeometry = new SphereGeometry(6, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fifthPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fifthPlanet.jpg') });
     fiplanet = new gameObject(sphereGeometry, sphereMaterial, 45, 0, 50);
     scene.add(fiplanet);
     console.log("Added the fifth planet to the scene");
     //Add the rotation to the fourth planet
     fifthPlanet = new Object3D();
     fifthPlanet.position.set(0, 0, 0);
+    fifthPlanet.castShadow = true;
     fifthPlanet.add(fiplanet);
     scene.add(fifthPlanet);
     // add an axis helper to the scene
@@ -237,7 +253,9 @@ function addControl(controlObject) {
     gui.add(controlObject, 'rotationSpeed', -0.5, 0.5);
     gui.add(camera.position, 'x', 25, 150);
     gui.add(camera.position, 'y', 0, 75);
-    gui.add(camera.position, 'z', 0, 100).step(5);
+    gui.add(camera.position, 'z', 0, 100);
+    gui.add(controlObject, 'zoomCameraIn');
+    gui.add(controlObject, 'zoomCameraOut');
 }
 function addStatsObject() {
     stats = new Stats();
@@ -287,5 +305,14 @@ function setupCamera() {
     camera.lookAt(new Vector3(0, 0, 0));
     console.log("Finished setting up Camera...");
 }
+/*
+function zoomCamera():void{
+    cameraZoom= new PerspectiveCamera(60, config.Screen.RATIO,0.1,1000);
+    cameraZoom.position.x= 40;
+    cameraZoom.position.y=10;
+    cameraZoom.position.z= 0;
+    //camera.lookAt(fistemptyRotation);
+    console.log("added zoomed camera");
+}*/ 
 
 //# sourceMappingURL=game.js.map

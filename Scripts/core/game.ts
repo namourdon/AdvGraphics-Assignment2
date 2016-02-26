@@ -1,5 +1,6 @@
+//Nashia Amourdon
+//Last edited:25.02.2016
 /// <reference path="_reference.ts"/>
-
 // MAIN GAME FILE
 
 // THREEJS Aliases
@@ -37,6 +38,7 @@ import gameObject = objects.gameObject;
 var scene: Scene;
 var renderer: Renderer;
 var camera: PerspectiveCamera;
+var cameraZoom:PerspectiveCamera;
 var axes: AxisHelper;
 //var cube: Mesh;
 var plane: Mesh;
@@ -61,6 +63,7 @@ var quaternion;
 var dirLight;
 var hemiLight;
 var moon: Mesh;
+var secondMoon:Mesh;
 var moonEmp: Object3D;
 var fistemptyRotation: Object3D;
 var secondPlanet: Object3D;
@@ -68,6 +71,7 @@ var thirdPlanet: Object3D;
 var fourthPlanet: Object3D;
 var fifthPlanet: Object3D;
 var lightEmpty: Object3D;
+var sMoonEmp:Object3D;
 
 function init() {
     // Instantiate a new Scene object
@@ -80,7 +84,7 @@ function init() {
     // Add the sun to the Scene
     sphereGeometry = new SphereGeometry(8, 32, 32);
 
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/sun.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/sun.jpg') });
     sphereMaterial.opacity = 0.1;
     //sphereMaterial.transparent= true;
     //sphereMaterial.map= THREE.ImageUtils.loadTexture('Stone03.jpg');
@@ -90,8 +94,9 @@ function init() {
     
     //Add the first planet to the scene
     sphereGeometry = new SphereGeometry(7, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fourthPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fourthPlanet.jpg') });
     fplanet = new gameObject(sphereGeometry, sphereMaterial, 20, 0, 1);
+    fplanet.castShadow=true;
     scene.add(fplanet);
     console.log("Added the first planet to the scene");
     
@@ -105,7 +110,8 @@ function init() {
     
     //Add the moon
     sphereGeometry = new SphereGeometry(2, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/moon.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture
+    ('Content/Images/moon.jpg', THREE.SphericalReflectionMapping) });
     moon = new gameObject(sphereGeometry, sphereMaterial, 10, 0, 1);
     fplanet.add(moon);
     console.log("Added a moon to the scene");
@@ -120,9 +126,10 @@ function init() {
    
     //Add the second planet to the scene
     sphereGeometry = new SphereGeometry(3, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/secondPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/secondPlanet.jpg') });
     splanet = new gameObject(sphereGeometry, sphereMaterial, 30, 0, 20);
     scene.add(splanet);
+    splanet.castShadow= true;
     console.log("Added the second planet to the scene");
     
     //Add the rotation to the Second Planet
@@ -133,20 +140,29 @@ function init() {
     
     //Add the third planet to the scene
     sphereGeometry = new SphereGeometry(4, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/thirdPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/thirdPlanet.jpg') });
     tplanet = new gameObject(sphereGeometry, sphereMaterial, 35, 0, 25);
     scene.add(tplanet);
     console.log("Added the third planet to the scene");
     
+    //Add a moon to the second planet
+    sphereGeometry = new SphereGeometry(1, 32, 32);
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture
+    ('Content/Images/moon.jpg', THREE.SphericalReflectionMapping) });
+    secondMoon = new gameObject(sphereGeometry, sphereMaterial, 5, 0, 1);
+    tplanet.add(secondMoon);
+    console.log("Added a moon to the scene");
+    
     //Add the rotation to the third planet
     thirdPlanet = new Object3D();
     thirdPlanet.position.set(0, 0, 0);
+    thirdPlanet.castShadow=true;
     thirdPlanet.add(tplanet);
     scene.add(thirdPlanet);
     
     //Add the fourth planet to the scene
     sphereGeometry = new SphereGeometry(3, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/firstPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/firstPlanet.jpg') });
     frplanet = new gameObject(sphereGeometry, sphereMaterial, 40, 0, 40);
     scene.add(frplanet);
     console.log("Added the fourth planet to the scene");
@@ -154,12 +170,13 @@ function init() {
     //Add the rotation to the fourth planet
     fourthPlanet = new Object3D();
     fourthPlanet.position.set(0, 0, 0);
+    fourthPlanet.castShadow= true;
     fourthPlanet.add(frplanet);
     scene.add(fourthPlanet);
     
     //Add the fifth planet to the scene
     sphereGeometry = new SphereGeometry(6, 32, 32);
-    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fifthPlanet.jpg', THREE.SphericalReflectionMapping) });
+    sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/fifthPlanet.jpg') });
     fiplanet = new gameObject(sphereGeometry, sphereMaterial, 45, 0, 50);
     scene.add(fiplanet);
     console.log("Added the fifth planet to the scene");
@@ -167,6 +184,7 @@ function init() {
     //Add the rotation to the fourth planet
     fifthPlanet = new Object3D();
     fifthPlanet.position.set(0, 0, 0);
+    fifthPlanet.castShadow= true;
     fifthPlanet.add(fiplanet);
     scene.add(fifthPlanet);
     
@@ -280,7 +298,9 @@ function addControl(controlObject: Control): void {
     gui.add(controlObject, 'rotationSpeed', -0.5, 0.5);
     gui.add(camera.position,'x',25,150);
     gui.add(camera.position,'y',0,75);
-    gui.add(camera.position,'z',0,100).step(5);
+    gui.add(camera.position,'z',0,100);
+   gui.add(controlObject,'zoomCameraIn');
+   gui.add(controlObject,'zoomCameraOut');
 }
 
 function addStatsObject() {
@@ -336,3 +356,12 @@ function setupCamera(): void {
     camera.lookAt(new Vector3(0, 0, 0));
     console.log("Finished setting up Camera...");
 }
+/*
+function zoomCamera():void{
+    cameraZoom= new PerspectiveCamera(60, config.Screen.RATIO,0.1,1000);
+    cameraZoom.position.x= 40;
+    cameraZoom.position.y=10;
+    cameraZoom.position.z= 0;
+    //camera.lookAt(fistemptyRotation);
+    console.log("added zoomed camera");
+}*/

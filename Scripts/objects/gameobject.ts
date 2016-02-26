@@ -1,5 +1,5 @@
+//Nashia Amourdon
 /// <reference path="../../typings/tsd.d.ts"/>
-
 module objects {
     export class gameObject extends THREE.Mesh {
         //PRIVATE INSTANCE VARIABLES +++++++++++++++++++++++++++++++++++++
