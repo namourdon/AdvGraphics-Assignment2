@@ -1,5 +1,5 @@
 //Nashia Amourdon
-//Last edited:25.02.2016
+//Last edited:26.02.2016
 /// <reference path="_reference.ts"/>
 // MAIN GAME FILE
 
@@ -38,7 +38,7 @@ import gameObject = objects.gameObject;
 var scene: Scene;
 var renderer: Renderer;
 var camera: PerspectiveCamera;
-var cameraZoom:PerspectiveCamera;
+//var cameraZoom:PerspectiveCamera;
 var axes: AxisHelper;
 //var cube: Mesh;
 var plane: Mesh;
@@ -72,6 +72,7 @@ var fourthPlanet: Object3D;
 var fifthPlanet: Object3D;
 var lightEmpty: Object3D;
 var sMoonEmp:Object3D;
+//var cameraFollow:Object3D;
 
 function init() {
     // Instantiate a new Scene object
@@ -83,7 +84,6 @@ function init() {
 	
     // Add the sun to the Scene
     sphereGeometry = new SphereGeometry(8, 32, 32);
-
     sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture('Content/Images/sun.jpg') });
     sphereMaterial.opacity = 0.1;
     //sphereMaterial.transparent= true;
@@ -100,14 +100,6 @@ function init() {
     scene.add(fplanet);
     console.log("Added the first planet to the scene");
     
-    //empty object to hold the moon
-    moonEmp = new Object3D();
-    moonEmp.position.set(0, 0, 1);
-    moonEmp.add(moon);
-    console.log("Added empty object to the moon");
-    scene.add(moonEmp);
-    
-    
     //Add the moon
     sphereGeometry = new SphereGeometry(2, 32, 32);
     sphereMaterial = new PhongMaterial({ map: THREE.ImageUtils.loadTexture
@@ -115,6 +107,13 @@ function init() {
     moon = new gameObject(sphereGeometry, sphereMaterial, 10, 0, 1);
     fplanet.add(moon);
     console.log("Added a moon to the scene");
+    
+    //empty object to hold the moon
+    moonEmp = new Object3D();
+    moonEmp.position.set(20, 0, 0);
+    moonEmp.add(moon);
+    console.log("Added empty object to the moon");
+    //scene.add(moonEmp);
   
     //empty object to hold the moon and first planet
     fistemptyRotation = new Object3D();
@@ -195,8 +194,8 @@ function init() {
     console.log("Added Axis Helper to scene...");
     
     // Add an AmbientLight to the scene
-   ambientLight = new AmbientLight(0x404040);
-   scene.add(ambientLight);
+    ambientLight = new AmbientLight(0x404040);
+    scene.add(ambientLight);
     console.log("Added an Ambient Light to Scene");
 
     //Add empty objects for lights 
@@ -204,13 +203,7 @@ function init() {
     //lightEmpty.position.set(8, 8, 8);
     //lightEmpty.add(hemiLight);
     //scene.add(lightEmpty);
-
-
-    //    var lightEmpty2 = new Object3D();
-    //  lightEmpty2.position.set(0, 0, 0);
-    //lightEmpty2.add(spotLight2);
-    //scene.add(lightEmpty2);
-
+    
     var spotLight = new THREE.SpotLight(0xffffff);
     spotLight.position.set(8, 8, 8);
     //spotLight.position.set(10,1,1);
@@ -283,7 +276,6 @@ function init() {
     document.body.appendChild(renderer.domElement);
     gameLoop(); // render the scene	
     window.addEventListener('resize', onResize, false);
-
 }
 
 function onResize(): void {
@@ -296,11 +288,13 @@ function onResize(): void {
 
 function addControl(controlObject: Control): void {
     gui.add(controlObject, 'rotationSpeed', -0.5, 0.5);
-    gui.add(camera.position,'x',25,150);
-    gui.add(camera.position,'y',0,75);
-    gui.add(camera.position,'z',0,100);
+    //gui.add(camera.position,'x',0,150);
+    //gui.add(camera.position,'y',0,75);
+    //gui.add(camera.position,'z',0,100);
+    gui.add(controlObject ,'zoomCameraOut');
     gui.add(controlObject,'zoomCameraIn');
-    gui.add(controlObject,'zoomCameraOut');
+    gui.add(controlObject,'zoomFourthPlanet');
+        
 }
 
 function addStatsObject() {
@@ -319,14 +313,16 @@ function gameLoop(): void {
     //cube.rotation.y += control.rotationSpeed;
     //sun.rotation.y+=control.rotationSpeed;
     fplanet.rotation.y += control.rotationSpeed*3;
-    moon.rotation.y += (control.rotationSpeed * 4);
+    moon.rotation.y += (control.rotationSpeed * 2);
+    splanet.rotation.y+=(control.rotationSpeed*2);
     //rotation empty Object
     moonEmp.rotation.y += (control.rotationSpeed * 8);
     fistemptyRotation.rotation.y += (control.rotationSpeed );
     secondPlanet.rotation.y += (control.rotationSpeed * 2);
-    thirdPlanet.rotation.y += control.rotationSpeed;
+    thirdPlanet.rotation.y += control.rotationSpeed*4;
     fourthPlanet.rotation.y += (control.rotationSpeed / 2);
     fifthPlanet.rotation.y += (control.rotationSpeed / 5);
+    //cameraFollow.rotation.y+=control.rotationSpeed;
     // render using requestAnimationFrame
     requestAnimationFrame(gameLoop);
 	
@@ -349,19 +345,14 @@ function setupCamera(): void {
     camera = new PerspectiveCamera(60, config.Screen.RATIO, 0.1, 1000);
     //camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     //Officiel:x=90,y=40,z=30
-    //plus pres:30,30,0
+    //plus pres:40,10,0
+    //47,9,2
     camera.position.x = 90;
     camera.position.y = 40;
     camera.position.z = 30;
     camera.lookAt(new Vector3(0, 0, 0));
-    console.log("Finished setting up Camera...");
+    console.log("Finished setting up Camera...");   
+   scene.add(camera);    
+  
 }
-/*
-function zoomCamera():void{
-    cameraZoom= new PerspectiveCamera(60, config.Screen.RATIO,0.1,1000);
-    cameraZoom.position.x= 40;
-    cameraZoom.position.y=10;
-    cameraZoom.position.z= 0;
-    //camera.lookAt(fistemptyRotation);
-    console.log("added zoomed camera");
-}*/
+ 

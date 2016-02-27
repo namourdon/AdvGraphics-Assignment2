@@ -1,3 +1,5 @@
+//Nashia Amourdon
+//Last date modified:26.02.2016
 module config {
    export class Screen {
         static WIDTH:number = 1024;

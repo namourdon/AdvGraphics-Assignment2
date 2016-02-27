@@ -1,3 +1,5 @@
+//Nashia Amourdon
+//Last date modified:26.02.2016
 var config;
 (function (config) {
     var Screen = (function () {
