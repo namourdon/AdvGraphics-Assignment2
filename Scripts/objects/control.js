@@ -1,5 +1,6 @@
 /// <reference path="../../typings/tsd.d.ts"/>
 //Nashia Amourdon
+//Last modified:26.02.2016
 var objects;
 (function (objects) {
     // CONTROL CLASS ++++++++++++++++++++++++++++++++++++++++++
